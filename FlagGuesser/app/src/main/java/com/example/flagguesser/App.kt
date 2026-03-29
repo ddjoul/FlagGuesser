@@ -1,50 +1,80 @@
 package com.example.flagguesser
 
 import androidx.compose.runtime.*
-import androidx.navigation.compose.*
-import com.example.flagguesser.data.*
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.example.flagguesser.ui.screens.*
+import com.example.flagguesser.ui.viewmodel.GameUiState
+import com.example.flagguesser.data.GameState
+import com.example.flagguesser.ui.viewmodel.GameViewModel
 
 @Composable
 fun App() {
     val navController = rememberNavController()
-
-    var gameState by remember { mutableStateOf(GameState()) }
+    val gameViewModel: GameViewModel = viewModel()
 
     NavHost(navController = navController, startDestination = "menu") {
-
         composable("menu") {
             MenuScreen(
-                onStartGame = { navController.navigate("region") }
+                onStartGame = { navController.navigate("region") },
+                onStatsClick = { navController.navigate("stats") }
             )
         }
 
         composable("region") {
+            val uiState by gameViewModel.uiState.collectAsState()
+            val currentGameState = (uiState as? GameUiState.GameStarted)?.gameState ?: GameState()
+
+            LaunchedEffect(Unit) {
+                if (uiState !is GameUiState.RegionsLoaded && uiState !is GameUiState.Loading) {
+                    gameViewModel.backToRegionSelection()
+                }
+            }
+
             RegionScreen(
-                gameState = gameState,
+                gameState = currentGameState,
                 onBack = { navController.popBackStack() },
                 onRegionSelected = { region ->
-                    gameState = gameState.startRegion(region)
+                    gameViewModel.selectRegion(region)
                     navController.navigate("game")
-                }
+                },
+                viewModel = gameViewModel
             )
         }
 
         composable("game") {
-            GameScreen(
-                gameState = gameState,
-                onPrev = {
-                    // если текущий индекс > 0, то -1, иначе последний флаг
-                    val prevIndex = if (gameState.currentIndex > 0) gameState.currentIndex - 1 else (gameState.currentRegion?.totalFlags ?: 1) - 1
-                    gameState = gameState.copy(currentIndex = prevIndex)
-                },
-                onNext = {
-                    val nextIndex = if (gameState.currentIndex < (gameState.currentRegion?.totalFlags
-                            ?: 1) - 1) gameState.currentIndex + 1 else 0
-                    gameState = gameState.copy(currentIndex = nextIndex)
-                },
-                onExit = { navController.popBackStack("region", false) }
-            )
+            val uiState by gameViewModel.uiState.collectAsState()
+            when (val state = uiState) {
+                is GameUiState.GameStarted -> {
+                    GameScreen(
+                        gameState = state.gameState,
+                        onPrev = { gameViewModel.onPrevFlag() },
+                        onNext = { gameViewModel.onNextFlag() },
+                        onExit = {
+                            gameViewModel.exitGameToRegions()
+                            navController.popBackStack("region", false)
+                        },
+                        onAnswer = { answer ->
+                            gameViewModel.onAnswerSelected(answer)
+                        }
+                    )
+                }
+                is GameUiState.GameFinished -> {
+                    LaunchedEffect(Unit) {
+                        gameViewModel.exitGameToRegions()
+                        navController.popBackStack("region", false)
+                    }
+                }
+                else -> {
+                    androidx.compose.material3.Text("Загрузка...")
+                }
+            }
+        }
+
+        composable("stats") {
+            StatsScreen(onBack = { navController.popBackStack() })
         }
     }
 }
