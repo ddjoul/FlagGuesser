@@ -1,3 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">FlagGuesser</string>
+    <string name="btn_game">Game</string>
+    <string name="btn_stats">Statistics</string>
+    <string name="btn_language">Language</string>
+    <string name="btn_back_to_regions">&lt; Back to regions</string>
+    <string name="btn_reset_stats">Reset statistics</string>
+    <string name="label_region">Region</string>
+    <string name="label_statistics">STATISTICS</string>
+    <string name="label_correct_flags">Total correct flags:</string>
+    <string name="label_attempts">Total attempts:</string>
+    <string name="label_accuracy">Accuracy: %d%%</string>
+    <string name="label_flag_not_loaded">Flag not loaded</string>
+    <string name="label_loading">Loading…</string>
+    <string name="label_choose_region">Choose a region</string>
+    <string name="lang_russian">Русский</string>
+    <string name="lang_english">English</string>
+    <string name="lang_screen_title">LANGUAGE</string>
+    <string name="error_load">Load error: %s</string>
+    <string name="error_no_countries">No countries in region %s</string>
 </resources>

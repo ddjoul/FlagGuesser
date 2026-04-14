@@ -11,6 +11,8 @@ import com.example.flagguesser.ui.components.BaseScreen
 import com.example.flagguesser.ui.components.MainButton
 import com.example.flagguesser.ui.components.TopPanel
 import com.example.flagguesser.ui.viewmodel.StatsViewModel
+import androidx.compose.ui.res.stringResource
+import com.example.flagguesser.R
 
 @Composable
 fun StatsScreen(onBack: () -> Unit) {
@@ -19,7 +21,7 @@ fun StatsScreen(onBack: () -> Unit) {
 
     BaseScreen {
         Column(modifier = Modifier.fillMaxSize()) {
-            TopPanel("СТАТИСТИКА", showBack = true, onBack = onBack)
+            TopPanel(stringResource(R.string.label_statistics), showBack = true, onBack = onBack)
 
             Spacer(Modifier.height(52.dp))
 
@@ -34,20 +36,23 @@ fun StatsScreen(onBack: () -> Unit) {
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
                 ) {
                     Column(modifier = Modifier.padding(24.dp)) {
-                        Text("Всего угадано флагов:", style = MaterialTheme.typography.bodyLarge)
+                        Text(stringResource(R.string.label_correct_flags), style = MaterialTheme.typography.bodyLarge)
                         Text("${stats.first}", style = MaterialTheme.typography.displayLarge)
                         Spacer(Modifier.height(16.dp))
-                        Text("Всего попыток ответа:", style = MaterialTheme.typography.bodyLarge)
+                        Text(stringResource(R.string.label_attempts), style = MaterialTheme.typography.bodyLarge)
                         Text("${stats.second}", style = MaterialTheme.typography.displayLarge)
                         Spacer(Modifier.height(16.dp))
                         val accuracy = if (stats.second > 0) (stats.first.toFloat() / stats.second * 100).toInt() else 0
-                        Text("Точность: $accuracy%", style = MaterialTheme.typography.bodyLarge)
+                        Text(
+                            stringResource(R.string.label_accuracy, accuracy),
+                            style = MaterialTheme.typography.bodyLarge
+                        )
                     }
                 }
 
                 Spacer(Modifier.height(35.dp))
 
-                MainButton("Сбросить статистику", Modifier.fillMaxWidth()) {
+                MainButton(stringResource(R.string.btn_reset_stats), Modifier.fillMaxWidth()) {
                     statsViewModel.resetStats()
                 }
             }
