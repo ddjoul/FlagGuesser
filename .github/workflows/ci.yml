@@ -1,4 +1,4 @@
-name: CI/CD Pipeline
+name: Debug Structure
 
 on:
   push:
@@ -7,105 +7,37 @@ on:
     branches: [ main ]
 
 jobs:
-  build-and-test:
+  debug:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
     
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
     
-    # Отладка - проверим структуру
-    - name: Check structure
+    - name: Show full directory structure
       run: |
-        echo "Root directory:"
+        echo "=== Current directory ==="
+        pwd
+        echo ""
+        echo "=== Root directory contents ==="
         ls -la
         echo ""
-        echo "FlagGuesser directory:"
-        ls -la FlagGuesser/ || echo "No FlagGuesser folder"
+        echo "=== Find all gradlew files ==="
+        find . -name "gradlew" -type f 2>/dev/null
         echo ""
-        echo "Inner FlagGuesser directory:"
-        ls -la FlagGuesser/FlagGuesser/ || echo "No inner FlagGuesser folder"
-    
-    - name: Set up JDK 17
-      uses: actions/setup-java@v4
-      with:
-        java-version: '17'
-        distribution: 'temurin'
-    
-    - name: Setup Gradle
-      uses: gradle/actions/setup-gradle@v3
-      with:
-        build-root-directory: ./FlagGuesser/FlagGuesser
-    
-    - name: Cache Gradle dependencies
-      uses: actions/cache@v4
-      with:
-        path: |
-          ~/.gradle/caches
-          ~/.gradle/wrapper
-          ./FlagGuesser/FlagGuesser/.gradle
-        key: ${{ runner.os }}-gradle-${{ hashFiles('./FlagGuesser/FlagGuesser/**/*.gradle*', './FlagGuesser/FlagGuesser/**/gradle-wrapper.properties') }}
-        restore-keys: |
-          ${{ runner.os }}-gradle-
-    
-    # Grant execute permission for gradlew (правильный путь)
-    - name: Grant execute permission for gradlew
-      run: chmod +x ./FlagGuesser/FlagGuesser/gradlew
-    
-    # Run unit tests
-    - name: Run Unit Tests
-      run: |
-        cd ./FlagGuesser/FlagGuesser
-        ./gradlew testDebugUnitTest --stacktrace
-    
-    # Upload test results
-    - name: Upload test results
-      if: always()
-      uses: actions/upload-artifact@v4
-      with:
-        name: test-results
-        path: ./FlagGuesser/FlagGuesser/app/build/test-results/
-        retention-days: 7
-    
-    # Build Debug APK
-    - name: Build Debug APK
-      run: |
-        cd ./FlagGuesser/FlagGuesser
-        ./gradlew assembleDebug
-    
-    # Upload Debug APK
-    - name: Upload Debug APK
-      uses: actions/upload-artifact@v4
-      with:
-        name: app-debug-apk
-        path: ./FlagGuesser/FlagGuesser/app/build/outputs/apk/debug/*.apk
-        retention-days: 30
-    
-    # Build Release APK
-    - name: Build Release APK
-      if: github.ref == 'refs/heads/main'
-      run: |
-        cd ./FlagGuesser/FlagGuesser
-        ./gradlew assembleRelease
-    
-    # Upload Release APK
-    - name: Upload Release APK
-      uses: actions/upload-artifact@v4
-      if: github.ref == 'refs/heads/main'
-      with:
-        name: flagguesser-release-${{ github.run_number }}
-        path: ./FlagGuesser/FlagGuesser/app/build/outputs/apk/release/*.apk
-        retention-days: 90
-    
-    # Create GitHub Release
-    - name: Create Release
-      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-      uses: softprops/action-gh-release@v2
-      with:
-        tag_name: v${{ github.run_number }}
-        name: Release v${{ github.run_number }}
-        files: ./FlagGuesser/FlagGuesser/app/build/outputs/apk/release/*.apk
-        generate_release_notes: true
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        echo "=== Find all build.gradle files ==="
+        find . -name "build.gradle*" -type f 2>/dev/null
+        echo ""
+        echo "=== Complete tree structure (first 3 levels) ==="
+        find . -type d -maxdepth 3 | sort
+        echo ""
+        echo "=== Check if FlagGuesser folder exists ==="
+        if [ -d "FlagGuesser" ]; then
+          echo "FlagGuesser folder exists, contents:"
+          ls -la FlagGuesser/
+        else
+          echo "FlagGuesser folder NOT found in root"
+        fi
+        echo ""
+        echo "=== Check if there's any gradle wrapper jar ==="
+        find . -name "gradle-wrapper.jar" -type f 2>/dev/null
