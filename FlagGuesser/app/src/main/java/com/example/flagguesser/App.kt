@@ -9,9 +9,9 @@ import com.example.flagguesser.ui.screens.*
 import com.example.flagguesser.ui.viewmodel.GameUiState
 import com.example.flagguesser.data.GameState
 import com.example.flagguesser.ui.viewmodel.GameViewModel
-
+import com.example.flagguesser.ui.viewmodel.LanguageViewModel
 @Composable
-fun App() {
+fun App(langViewModel: LanguageViewModel = viewModel()) {
     val navController = rememberNavController()
     val gameViewModel: GameViewModel = viewModel()
 
@@ -19,7 +19,8 @@ fun App() {
         composable("menu") {
             MenuScreen(
                 onStartGame = { navController.navigate("region") },
-                onStatsClick = { navController.navigate("stats") }
+                onStatsClick = { navController.navigate("stats") },
+                onLanguageClick = { navController.navigate("language") }
             )
         }
 
@@ -75,6 +76,13 @@ fun App() {
 
         composable("stats") {
             StatsScreen(onBack = { navController.popBackStack() })
+        }
+
+        composable("language") {
+            LanguageScreen(
+                langViewModel = langViewModel,
+                onBack = { navController.popBackStack() }
+            )
         }
     }
 }

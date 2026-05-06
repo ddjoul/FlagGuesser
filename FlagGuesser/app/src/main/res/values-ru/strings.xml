@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">FlagGuesser</string>
+    <string name="btn_game">Игра</string>
+    <string name="btn_stats">Статистика</string>
+    <string name="btn_language">Язык</string>
+    <string name="btn_back_to_regions">&lt; К регионам</string>
+    <string name="btn_reset_stats">Сбросить статистику</string>
+    <string name="label_region">Регион</string>
+    <string name="label_statistics">СТАТИСТИКА</string>
+    <string name="label_correct_flags">Всего угадано флагов:</string>
+    <string name="label_attempts">Всего попыток ответа:</string>
+    <string name="label_accuracy">Точность: %d%%</string>
+    <string name="label_flag_not_loaded">Флаг не загружен</string>
+    <string name="label_loading">Загрузка…</string>
+    <string name="label_choose_region">Выберите регион</string>
+    <string name="lang_russian">Русский</string>
+    <string name="lang_english">English</string>
+    <string name="lang_screen_title">ЯЗЫК</string>
+    <string name="error_load">Ошибка загрузки: %s</string>
+    <string name="error_no_countries">Нет стран в регионе %s</string>
+</resources>

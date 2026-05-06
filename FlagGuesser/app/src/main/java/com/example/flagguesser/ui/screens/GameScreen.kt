@@ -21,6 +21,8 @@ import com.example.flagguesser.ui.components.MainButton
 import com.example.flagguesser.ui.components.TopPanel
 import com.example.flagguesser.ui.theme.ProgressColor
 import com.example.flagguesser.ui.theme.StrokeColor
+import androidx.compose.ui.res.stringResource
+import com.example.flagguesser.R
 
 @Composable
 fun GameScreen(
@@ -73,7 +75,7 @@ fun GameScreen(
                             modifier = Modifier.fillMaxSize()
                         )
                     } else {
-                        Text("Флаг не загружен", color = MaterialTheme.colorScheme.onSurface)
+                        Text(stringResource(R.string.label_flag_not_loaded), color = MaterialTheme.colorScheme.onSurface)
                     }
                 }
 
@@ -120,7 +122,7 @@ fun GameScreen(
             }
 
             MainButton(
-                "< К регионам",
+                stringResource(R.string.btn_back_to_regions),
                 Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 24.dp)

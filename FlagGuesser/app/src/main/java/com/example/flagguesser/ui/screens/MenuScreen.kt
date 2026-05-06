@@ -4,7 +4,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.example.flagguesser.R
 import com.example.flagguesser.ui.components.BaseScreen
 import com.example.flagguesser.ui.components.MainButton
 import com.example.flagguesser.ui.components.TopPanel
@@ -25,11 +27,11 @@ fun MenuScreen(
                     .padding(horizontal = 24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                MainButton("Игра", Modifier.fillMaxWidth(), onStartGame)
+                MainButton(stringResource(R.string.btn_game), Modifier.fillMaxWidth(), onStartGame)
                 Spacer(Modifier.height(35.dp))
-                MainButton("Статистика", Modifier.fillMaxWidth(), onStatsClick)
+                MainButton(stringResource(R.string.btn_stats), Modifier.fillMaxWidth(), onStatsClick)
                 Spacer(Modifier.height(35.dp))
-                MainButton("Язык", Modifier.fillMaxWidth(), onLanguageClick)
+                MainButton(stringResource(R.string.btn_language), Modifier.fillMaxWidth(), onLanguageClick)
             }
             Spacer(Modifier.weight(1f))
         }

@@ -18,6 +18,8 @@ import com.example.flagguesser.ui.components.TopPanel
 import com.example.flagguesser.ui.theme.ProgressColor
 import com.example.flagguesser.ui.viewmodel.GameUiState
 import com.example.flagguesser.ui.viewmodel.GameViewModel
+import androidx.compose.ui.res.stringResource
+import com.example.flagguesser.R
 
 @Composable
 fun RegionScreen(
@@ -35,7 +37,7 @@ fun RegionScreen(
 
     BaseScreen {
         Column(modifier = Modifier.fillMaxSize()) {
-            TopPanel("Регион", showBack = true, onBack = onBack)
+            TopPanel(stringResource(R.string.label_region), showBack = true, onBack = onBack)
             Spacer(Modifier.height(52.dp))
 
             when (uiState) {
@@ -68,7 +70,7 @@ fun RegionScreen(
                     )
                 }
                 else -> {
-                    Text("Выберите регион", modifier = Modifier.padding(24.dp))
+                    Text(stringResource(R.string.label_choose_region), modifier = Modifier.padding(24.dp))
                 }
             }
 
