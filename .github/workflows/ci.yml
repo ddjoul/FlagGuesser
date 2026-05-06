@@ -1,4 +1,4 @@
-name: Debug Structure
+name: CI/CD Pipeline
 
 on:
   push:
@@ -7,37 +7,85 @@ on:
     branches: [ main ]
 
 jobs:
-  debug:
+  build-and-test:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
     
-    - name: Show full directory structure
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+    
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@v3
+      with:
+        build-root-directory: ./FlagGuesser
+    
+    - name: Cache Gradle dependencies
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+          ./FlagGuesser/.gradle
+        key: ${{ runner.os }}-gradle-${{ hashFiles('./FlagGuesser/**/*.gradle*', './FlagGuesser/**/gradle-wrapper.properties') }}
+        restore-keys: |
+          ${{ runner.os }}-gradle-
+    
+    - name: Grant execute permission for gradlew
+      run: chmod +x ./FlagGuesser/gradlew
+    
+    - name: Run Unit Tests
       run: |
-        echo "=== Current directory ==="
-        pwd
-        echo ""
-        echo "=== Root directory contents ==="
-        ls -la
-        echo ""
-        echo "=== Find all gradlew files ==="
-        find . -name "gradlew" -type f 2>/dev/null
-        echo ""
-        echo "=== Find all build.gradle files ==="
-        find . -name "build.gradle*" -type f 2>/dev/null
-        echo ""
-        echo "=== Complete tree structure (first 3 levels) ==="
-        find . -type d -maxdepth 3 | sort
-        echo ""
-        echo "=== Check if FlagGuesser folder exists ==="
-        if [ -d "FlagGuesser" ]; then
-          echo "FlagGuesser folder exists, contents:"
-          ls -la FlagGuesser/
-        else
-          echo "FlagGuesser folder NOT found in root"
-        fi
-        echo ""
-        echo "=== Check if there's any gradle wrapper jar ==="
-        find . -name "gradle-wrapper.jar" -type f 2>/dev/null
+        cd ./FlagGuesser
+        ./gradlew testDebugUnitTest --stacktrace
+    
+    - name: Upload test results
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-results
+        path: ./FlagGuesser/app/build/test-results/
+        retention-days: 7
+    
+    - name: Build Debug APK
+      run: |
+        cd ./FlagGuesser
+        ./gradlew assembleDebug
+    
+    - name: Upload Debug APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: app-debug-apk
+        path: ./FlagGuesser/app/build/outputs/apk/debug/*.apk
+        retention-days: 30
+    
+    - name: Build Release APK
+      if: github.ref == 'refs/heads/main'
+      run: |
+        cd ./FlagGuesser
+        ./gradlew assembleRelease
+    
+    - name: Upload Release APK
+      uses: actions/upload-artifact@v4
+      if: github.ref == 'refs/heads/main'
+      with:
+        name: flagguesser-release-${{ github.run_number }}
+        path: ./FlagGuesser/app/build/outputs/apk/release/*.apk
+        retention-days: 90
+    
+    - name: Create Release
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: v${{ github.run_number }}
+        name: Release v${{ github.run_number }}
+        files: ./FlagGuesser/app/build/outputs/apk/release/*.apk
+        generate_release_notes: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
